@@ -3,6 +3,7 @@ module BreedloveDesign
     PATH = File.dirname(__FILE__) unless defined?(self::PATH)
 
     require(File.join(PATH, "ruby", "logger.rb"))
+    require(File.join(PATH, "ruby", "bridge.rb"))
     require(File.join(PATH, "ruby", "main_dialog.rb"))
 
     unless file_loaded?(__FILE__)

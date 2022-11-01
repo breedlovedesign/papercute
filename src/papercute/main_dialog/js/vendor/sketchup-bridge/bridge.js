@@ -1,4 +1,4 @@
-import RequestHandler from './request-handler.js'
+// import RequestHandler from './request-handler.js'
 import WebDialogRequestHandler from './request-handler-webdialog.js'
 import HtmlDialogRequestHandler from './request-handler-htmldialog.js'
 import BrowserPromptRequestHandler from './request-handler-browser-prompt.js'

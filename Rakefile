@@ -26,7 +26,17 @@ desc  "Copy ruby files"
 
 task :copy_ruby_files do
   dest_base  = "dist/papercute/ruby"
-  src_files = FileList['src/papercute/ruby/*.rb' ]
+  src_files = FileList['src/papercute/ruby/*.rb']
+  src_files.each do |src|
+    cp src, dest_base
+  end
+end
+
+desc  "Copy icons"
+
+task :copy_icons do
+  dest_base  = "dist/papercute/ruby/ui_assets"
+  src_files = FileList['src/papercute/ruby/ui_assets/*.png']
   src_files.each do |src|
     cp src, dest_base
   end

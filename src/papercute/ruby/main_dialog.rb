@@ -1,11 +1,19 @@
 module BreedloveDesign
   module Papercute
     class MainDialog
-    include Logger
+      include Logger
       def initialize
         dia = UI::HtmlDialog.new(options)
         dia.set_url( html_url )
         dia.show
+        dia.set_on_closed do
+          log "on close write toolbar visibility: #{UI::Toolbar.new("Papercute").visible?}", false
+          Sketchup.write_default(
+            "com.sketchup.SketchUp.2022",
+            "com.BreedloveDesign.Papercute.show_tb",
+            UI::Toolbar.new("Papercute").visible?
+          )
+        end
       end
 
       private
@@ -25,10 +33,9 @@ module BreedloveDesign
         html_path = File.join(this_ruby_file_dir, relative_path)
         absolute_html_path = File.absolute_path(html_path)
         html_url = "file://#{absolute_html_path}"
-        log({html_path: html_path, absolute_html_path: absolute_html_path, html_url: html_url}, true)
+        log({html_path: html_path, absolute_html_path: absolute_html_path, html_url: html_url}, false)
         return html_url
       end
-    end
-
+    end # class MainDialog
   end # module Papercute
 end # module BreedloveDesign

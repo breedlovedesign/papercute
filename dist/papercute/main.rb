@@ -14,6 +14,24 @@ module BreedloveDesign
           $stderr << error
         end
       end
+      toolbar = UI::Toolbar.new "Papercute"
+      cmd =
+        UI::Command.new("Papercute") do
+          MainDialog.new
+        end
+      cmd.small_icon = File.join(PATH, "ruby", "ui_assets", "papercute_16.png")
+      cmd.large_icon = File.join(PATH, "ruby", "ui_assets", "papercute_32.png")
+      cmd.tooltip = "Render to 2D with PaperJS"
+      cmd.status_bar_text = "Papercute"
+      cmd.menu_text = "Papercute"
+      toolbar = toolbar.add_item cmd
+      if Sketchup.read_default(
+           "com.sketchup.SketchUp.2022",
+           "com.BreedloveDesign.Papercute.show_tb"
+         )
+        toolbar.show
+      end
+      file_loaded(__FILE__)
     end
   end # module Papercute
 end # module BreedloveDesign

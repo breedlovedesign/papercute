@@ -2,7 +2,8 @@
 
 ## SVG export from SketchUp
 This is a SketchUp extension that exports 2D vector output.
-![Preview1](./readme.png, "example")
+</br>
+![Preview1](./readme.png)
 
 ## What it Does
 

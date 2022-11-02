@@ -5,6 +5,7 @@ module BreedloveDesign
       def initialize
         dia = UI::HtmlDialog.new(options)
         dia.set_url( html_url )
+        dia.set_size(vpw, vph + 30 + 26)
         dia.show
         dia.set_on_closed do
           log "on close write toolbar visibility: #{UI::Toolbar.new("Papercute").visible?}", false
@@ -17,6 +18,14 @@ module BreedloveDesign
       end
 
       private
+      def vpw
+        Sketchup.active_model.active_view.vpwidth
+      end
+
+      def vph
+        Sketchup.active_model.active_view.vpheight
+      end
+
       def options
         {style: UI::HtmlDialog::STYLE_WINDOW}
       end

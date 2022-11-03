@@ -5,6 +5,7 @@ module BreedloveDesign
       def initialize
         dia = UI::HtmlDialog.new(options)
         dia.set_url( html_url )
+        # 30 and 26 pixels I arrived at by trial and error
         dia.set_size(vpw, vph + 30 + 26)
         dia.show
         dia.set_on_closed do
@@ -27,7 +28,7 @@ module BreedloveDesign
       end
 
       def options
-        {style: UI::HtmlDialog::STYLE_WINDOW}
+        {style: UI::HtmlDialog::STYLE_WINDOW, width: vpw, height: vph}
       end
 
       def html_url

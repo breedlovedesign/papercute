@@ -1,3 +1,4 @@
+# typed: false
 module BreedloveDesign
   module Papercute
     class MainDialog

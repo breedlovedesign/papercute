@@ -1,43 +1,66 @@
-desc  "Build"
-task default:  [:build_ruby]
+desc "Build"
+task default: [:build_ruby]
 
+desc "Build ruby files"
 
-desc  "Build ruby files"
+task build_ruby: %i[copy_ruby_entry_point copy_ruby_file_loader copy_ruby_files]
 
-task build_ruby: [:copy_ruby_entry_point, :copy_ruby_file_loader, :copy_ruby_files ]
-
-desc  "Copy ruby entry point"
+desc "Copy ruby entry point"
 
 task :copy_ruby_entry_point do
-  src  = 'src/papercute.rb'
-  dest = 'dist/papercute.rb'
+  src = "src/papercute.rb"
+  dest = "dist/papercute.rb"
   cp src, dest
 end
 
-desc  "Copy ruby file loader"
+desc "Copy ruby file loader"
 
 task :copy_ruby_file_loader do
-  src  = 'src/papercute/main.rb'
-  dest = 'dist/papercute/main.rb'
+  src = "src/papercute/main.rb"
+  dest = "dist/papercute/main.rb"
   cp src, dest
 end
 
-desc  "Copy ruby files"
+desc "Copy ruby files"
 
 task :copy_ruby_files do
-  dest_base  = "dist/papercute/ruby"
-  src_files = FileList['src/papercute/ruby/*.rb']
-  src_files.each do |src|
-    cp src, dest_base
+  dest_base = "dist/papercute/ruby"
+  src_files = FileList["src/papercute/ruby/*.rb"]
+  src_files.each { |src| cp src, dest_base }
+end
+
+desc "Copy icons"
+
+task :copy_icons do
+  dest_base = "dist/papercute/ruby/ui_assets"
+  src_files = FileList["src/papercute/ruby/ui_assets/*.png"]
+  src_files.each { |src| cp src, dest_base }
+end
+
+desc "Replace sorbet sigil with frozen string literal"
+
+task :replace_sorbet_sigil_with_frozen_string_literal do
+  files_to_unsigil =
+    FileList[
+      "dist/papercute/ruby/*.rb",
+      "dist/papercute/main.rb",
+      "dist/papercute.rb"
+    ]
+  pattern = /^#\s?typed:.*$\n/ # matches Sorbet type
+  files_to_unsigil.each do |file|
+    modified = File.read(file).gsub(pattern, "# frozen_string_literal: true\n")
+    File.write(file, modified)
   end
 end
 
-desc  "Copy icons"
+desc "Comment out Sorbet sigs via Curdle gem"
 
-task :copy_icons do
-  dest_base  = "dist/papercute/ruby/ui_assets"
-  src_files = FileList['src/papercute/ruby/ui_assets/*.png']
-  src_files.each do |src|
-    cp src, dest_base
-  end
+task :curdle do
+  files_to_curdle =
+    FileList[
+      "dist/papercute/ruby/*.rb",
+      "dist/papercute/main.rb",
+      "dist/papercute.rb"
+    ]
+  files_to_curdle.each { |file| system("curdle #{file}") }
 end

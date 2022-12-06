@@ -1,4 +1,4 @@
-# typed: true
+# typed: false
 require "sketchup.rb"
 require "extensions.rb"
 

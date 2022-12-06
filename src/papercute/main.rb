@@ -1,12 +1,12 @@
-# typed: false
+# typed: true
 module BreedloveDesign
   module Papercute
+    include T::Sig
     PATH = File.dirname(__FILE__) unless defined?(self::PATH)
 
     require(File.join(PATH, "ruby", "logger.rb"))
-    require(File.join(PATH, "ruby", "bridge.rb"))
+    require(File.join(PATH, "ruby", "vendor/bridge.rb"))
     require(File.join(PATH, "ruby", "main_dialog.rb"))
-
     unless file_loaded?(__FILE__)
       UI
         .menu("extensions")

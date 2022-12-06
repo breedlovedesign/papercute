@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+# typed: false
 module BreedloveDesign
   module Papercute
     PATH = File.dirname(__FILE__) unless defined?(self::PATH)

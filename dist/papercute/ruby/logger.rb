@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+# typed: true
 module BreedloveDesign
   module Papercute
     module Logger

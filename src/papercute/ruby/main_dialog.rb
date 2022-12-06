@@ -2,6 +2,7 @@
 module BreedloveDesign
   module Papercute
     class MainDialog
+      extend T::Sig
       include Logger
       def initialize
         dia = UI::HtmlDialog.new(options)

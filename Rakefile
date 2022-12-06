@@ -1,9 +1,22 @@
+Dairy =
+  FileList[
+    "dist/papercute/ruby/*.rb",
+    "dist/papercute/ruby/vendor/bridge.rb",
+    "dist/papercute/main.rb",
+    "dist/papercute.rb"
+  ]
+
 desc "Build"
 task default: [:build_ruby]
 
 desc "Build ruby files"
 
-task build_ruby: %i[copy_ruby_entry_point copy_ruby_file_loader copy_ruby_files]
+task build_ruby: %i[
+       copy_ruby_entry_point
+       copy_ruby_file_loader
+       copy_ruby_bridge
+       copy_ruby_files
+     ]
 
 desc "Copy ruby entry point"
 
@@ -18,6 +31,14 @@ desc "Copy ruby file loader"
 task :copy_ruby_file_loader do
   src = "src/papercute/main.rb"
   dest = "dist/papercute/main.rb"
+  cp src, dest
+end
+
+desc "Copy ruby bridge"
+
+task :copy_ruby_bridge do
+  src = "src/papercute/ruby/vendor/bridge.rb"
+  dest = "dist/papercute/ruby/vendor/bridge.rb"
   cp src, dest
 end
 
@@ -40,14 +61,8 @@ end
 desc "Replace sorbet sigil with frozen string literal"
 
 task :replace_sorbet_sigil_with_frozen_string_literal do
-  files_to_unsigil =
-    FileList[
-      "dist/papercute/ruby/*.rb",
-      "dist/papercute/main.rb",
-      "dist/papercute.rb"
-    ]
   pattern = /^#\s?typed:.*$\n/ # matches Sorbet type
-  files_to_unsigil.each do |file|
+  Dairy.each do |file|
     modified = File.read(file).gsub(pattern, "# frozen_string_literal: true\n")
     File.write(file, modified)
   end
@@ -56,11 +71,5 @@ end
 desc "Comment out Sorbet sigs via Curdle gem"
 
 task :curdle do
-  files_to_curdle =
-    FileList[
-      "dist/papercute/ruby/*.rb",
-      "dist/papercute/main.rb",
-      "dist/papercute.rb"
-    ]
-  files_to_curdle.each { |file| system("curdle #{file}") }
+  Dairy.each { |file| system("curdle #{file}") }
 end

@@ -1,4 +1,4 @@
-# typed: false
+# frozen_string_literal: true
 module BreedloveDesign
   module Papercute
     class Bridge

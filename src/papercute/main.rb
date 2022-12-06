@@ -1,7 +1,7 @@
 # typed: true
 module BreedloveDesign
   module Papercute
-    include T::Sig
+    extend T::Sig
     PATH = File.dirname(__FILE__) unless defined?(self::PATH)
 
     require(File.join(PATH, "ruby", "logger.rb"))

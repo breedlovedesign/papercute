@@ -1,8 +1,8 @@
-# frozen_string_literal: true
+# typed: true
 module BreedloveDesign
   module Papercute
     class RussianDoll
-      
+      extend T::Sig
       # is_leaf?
       # is_model?
       # children

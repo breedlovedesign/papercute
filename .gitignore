@@ -1,8 +1,7 @@
 node_modules
 scratch
-sorbet
+# sorbet
 main.code-workspace
-ruby/vendor
 
 # Syncthing caches
 .stversions

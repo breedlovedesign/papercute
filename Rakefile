@@ -1,3 +1,4 @@
+# typed: false
 Dairy =
   FileList[
     "dist/papercute/ruby/*.rb",

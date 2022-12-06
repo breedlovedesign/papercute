@@ -1,0 +1,4 @@
+--dir
+.
+--ignore=dist/
+--ignore=scratch/

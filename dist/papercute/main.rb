@@ -7,6 +7,7 @@ module BreedloveDesign
     require(File.join(PATH, "ruby", "logger.rb"))
     require(File.join(PATH, "ruby", "vendor/bridge.rb"))
     require(File.join(PATH, "ruby", "main_dialog.rb"))
+    require(File.join(PATH, "ruby", "node.rb"))
     unless file_loaded?(__FILE__)
       UI
         .menu("extensions")

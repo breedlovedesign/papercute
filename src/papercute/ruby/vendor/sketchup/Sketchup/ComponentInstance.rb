@@ -29,20 +29,22 @@ module BreedloveDesign
       # component instance.
       #
       # @example
-      #   # First create an instance for us to look at.
-      #   entities = Sketchup.active_model.entities
-      #   definition = Sketchup.active_model.definitions[0]
-      #   transformation = Geom::Transformation.new([0,0,0])
-      #   componentinstance = entities.add_instance(definition, transformation)
+      #    First create an instance for us to look at.
+      #    `entities = Sketchup.active_model.entities`
+      #    `definition = Sketchup.active_model.definitions[0]`
+      #    `transformation = Geom::Transformation.new([0,0,0])`
+      #    `componentinstance = entities.add_instance(definition, transformation)`
       #
-      #   # You can get an instance's definition with this method.
-      #   definition = componentinstance.definition
+      #    You can get an instance's definition with this method.
+      #    `definition = componentinstance.definition`
       #
       # @return [Sketchup::ComponentDefinition] a ComponentDefinition object if
       #   successful
       #
       # @version SketchUp 6.0
+      sig { returns(Sketchup::ComponentDefinition) }
       def definition
+        Sketchup::ComponentDefinition.new
       end
 
       # The definition= method is used to set the component definition for this

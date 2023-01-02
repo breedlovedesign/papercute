@@ -7,6 +7,10 @@ module BreedloveDesign
     require(File.join(PATH, "ruby", "logger.rb"))
     require(File.join(PATH, "ruby", "vendor/bridge.rb"))
     require(File.join(PATH, "ruby", "main_dialog.rb"))
+    require(File.join(PATH, "ruby", "sorter.rb"))
+    require(File.join(PATH, "ruby", "color_utils.rb"))
+    require(File.join(PATH, "ruby", "projection_2d.rb"))
+    require(File.join(PATH, "ruby", "clump.rb"))
     require(File.join(PATH, "ruby", "node.rb"))
     unless file_loaded?(__FILE__)
       UI

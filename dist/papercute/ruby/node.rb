@@ -36,6 +36,9 @@ module BreedloveDesign
             @name.gsub!(/#/, "_")
           end
         end
+
+        @clumps = @parts.select { |part| }
+
         @children = set_children.sort_by { |n| n.name }
         @children.sort_by! { |n| n.is_leaf? ? 1 : 0 }
         @name = "model" if @name == "model_" && @children.count == 0
@@ -80,9 +83,65 @@ module BreedloveDesign
       end
 
 
-      def clumps()
-      end
+      def get_clumps(
+        faces:,
+        enclosing_tr:,
+        depth:,
+        ent_id:,
+        inherited_color:,
+        groups_of_connected_front_facing_faces: []
+      )
+        unprocessed_faces =
+          faces.reject { |f| Sorter.rear_facing?(f, enclosing_tr) }
+        clump_seed = unprocessed_faces.shift
+        if clump_seed
+          clump_of_faces =
+            clump_seed.all_connected.select { |ent| ent.is_a?(Sketchup::Face) }
+          clump_of_front_faces =
+            clump_of_faces.reject do |face|
+              Sorter.rear_facing?(face, enclosing_tr)
+            end
+          unless groups_of_connected_front_facing_faces.include?(
+                   clump_of_front_faces
+                 )
+            groups_of_connected_front_facing_faces << clump_of_front_faces
+          end
+          unprocessed_faces -= clump_of_front_faces
+          depth += 1
 
+          get_clumps faces: unprocessed_faces,
+                     enclosing_tr: enclosing_tr,
+                     depth: depth,
+                     ent_id: ent_id,
+                     inherited_color: inherited_color,
+                     groups_of_connected_front_facing_faces:
+                       groups_of_connected_front_facing_faces
+        else
+          thing = groups_of_connected_front_facing_faces[0]
+          if thing
+            thing.sort_by! do |face|
+              [
+                Sorter.largest_z(face),
+                Sorter.largest_x(face),
+                Sorter.largest_y(face)
+              ]
+            end
+          else
+          end
+          clump_objects =
+            groups_of_connected_front_facing_faces.collect do |group_of_faces|
+              Clump.new(
+                faces: group_of_faces,
+                tr: enclosing_tr,
+                inherited_color: inherited_color,
+                ent_id: ent_id
+              )
+            end
+          depth -= 1
+
+          return clump_objects
+        end
+      end
 
       def summary_outline()
       end
@@ -92,17 +151,13 @@ module BreedloveDesign
       end
 
       def inspect
+        # #inspect does not like to be recursive
         self.graph
-        # parent = @parent ? "<parent:#{@parent.to_s}|" : "<"
-        # if @children.empty?
-        #   parent + "self:" + @name + "leaf" + ">"
-        # else
-        #   parent + "self:" + @name + "|" + "kids:#{@children}>"
-        # end
       end
 
+
       def graph(g: "", depth: 0)
-        if @children.empty? && @name == "model"
+        if @children.empty? && is_model_node?
           g = @name + "_(empty)"
         elsif @children.empty?
           depth += 1

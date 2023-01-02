@@ -12,6 +12,9 @@ module BreedloveDesign
     require(File.join(PATH, "ruby", "projection_2d.rb"))
     require(File.join(PATH, "ruby", "clump.rb"))
     require(File.join(PATH, "ruby", "node.rb"))
+    $faces_with_no_soft_edges_count = 0
+    $faces_with_some_soft_edges_count = 0
+    $faces_with_all_soft_edges_count = 0
     unless file_loaded?(__FILE__)
       UI
         .menu("extensions")

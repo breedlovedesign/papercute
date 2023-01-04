@@ -34,9 +34,9 @@ module BreedloveDesign
           positions.collect do |pt|
             view = Sketchup.active_model.active_view
             screen_position_3d = view.screen_coords(pt)
+            # screen_position = screen_position_3d.to_a[0..1].collect { |coord| coord }
             screen_position =
-              screen_position_3d.to_a[0..1].collect { |coord| coord }
-            #screen_position = screen_position_3d.to_a[0..1].collect {|coord| coord.to_i }
+              screen_position_3d.to_a[0..1].collect { |coord| coord.to_i }
           end
         # [ [x,y], [x,y], [x,y]...] array of points
         # stupscreen_positions.to_json

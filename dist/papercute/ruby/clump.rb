@@ -92,7 +92,9 @@ module BreedloveDesign
       end
 
       def inspect
-        "clump_ent: #{@ent_id} clump_obj_id: #{self.object_id} face count: #{@faces.length}\n #{@faces2d.inspect}"
+        "clump_ent: #{@ent_id}\n" + "clump_obj_id: #{self.object_id}\n" +
+          "face count: #{@faces.length}\n" +
+          "faces:\n   #{@faces2d.pretty_inspect}"
       end
     end # class Clump
   end # module Papercute

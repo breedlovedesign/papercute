@@ -58,9 +58,9 @@ module BreedloveDesign
         end
 
         if face.material
-          mat = face.material
-          color = ColorUtils.fill_color(mat)
-          alpha = ColorUtils.su_color_alpha_to_f(color_obj: mat.color)
+          material = face.material
+          color = ColorUtils.material_to_color(material)
+          alpha = ColorUtils.su_color_alpha_to_f(color_obj: material.color)
         else
           color = inherited_color
           # TODO: inherited alpha

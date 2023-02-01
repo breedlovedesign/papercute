@@ -11,13 +11,16 @@ module BreedloveDesign
         when Sketchup::Model
           @parts = item.entities
           @tr = IDENTITY
-          @inheritable_traits = {}
+          @inheritable_traits = BaseTraits.new(model: item)
+          @inherited_traits = @inheritable_traits
           @name = "model_"
         when Sketchup::Group
           @parts = item.entities
           @tr = item.transformation
           @parent = parent
-          @inheritable_traits = @parent.inheritable_traits
+          @inherited_traits = @parent.inheritable_traits
+          @inheritable_traits =
+            Traits.new(item: item, inherited_traits: @inherited_traits)
           @name = item.name + "_" + item.persistent_id.to_s + "_"
           @name.gsub!(/#/, "_")
           @name.gsub!(/\s/, "_")
@@ -25,7 +28,7 @@ module BreedloveDesign
           @parent = parent
           @parts = item.definition.entities
           @tr = item.transformation
-          @inheritable_traits = @parent.inheritable_traits
+          @inherited_traits = @parent.inheritable_traits
           if item.name
             if item.name.length == 0
               @name =
@@ -48,6 +51,20 @@ module BreedloveDesign
 
       def is_leaf?()
         @children.empty?
+      end
+
+
+      def determine_inheritance(item)
+        if item.material
+          fill_color = ColorUtils
+          # alpha =
+        end
+        {
+          alpha: 1.0,
+          hidden: false,
+          edge_color: ColorUtils.default_edge_color,
+          fill_color: ColorUtils.default_face_color
+        }
       end
 
 

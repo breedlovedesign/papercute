@@ -18,7 +18,7 @@ module BreedloveDesign
 
       # returns a string in this format "#RRGGBB"
       sig { params(material: Sketchup::Material).returns(String) }
-      def self.fill_color(material)
+      def self.material_to_color(material)
         su_color_to_hex_str(color_obj: material.color)
       end
 
@@ -28,6 +28,13 @@ module BreedloveDesign
         # TODO: Respect rendering options on edges
         su_color_to_hex_str(
           color_obj: Sketchup.active_model.rendering_options["ForegroundColor"]
+        )
+      end
+
+      sig { returns(String) }
+      def self.default_face_color
+        su_color_to_hex_str(
+          color_obj: Sketchup.active_model.rendering_options["FaceFrontColor"]
         )
       end
 

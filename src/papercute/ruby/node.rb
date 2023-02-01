@@ -50,35 +50,28 @@ module BreedloveDesign
           end
         end
 
-        @clumps = @parts.select { |part| }
+        @faces = get_faces
+
+        if @faces.empty?
+          @clumps = []
+        else
+          get_clumps(
+            faces: @faces,
+            enclosing_tr: @tr,
+            ent_id: @name,
+            inherited_color: @inheritable_traits.fill_color
+          )
+        end
 
         @children = set_children.sort_by { |n| n.name }
         @children.sort_by! { |n| n.is_leaf? ? 1 : 0 }
         @name = "model" if @name == "model_" && @children.count == 0
       end
 
-      attr_reader :children, :inheritable_traits, :tr, :total_tr, :name #, :items(collection_items)
+      attr_reader :children, :inheritable_traits, :tr, :total_tr, :name, :clumps
       sig { returns(T::Boolean) }
       def is_leaf?()
         @children.empty?
-      end
-
-      sig do
-        params(
-          item: T.any(Sketchup::Group, Sketchup::ComponentInstance)
-        ).returns(T::Hash[T.untyped, T.untyped])
-      end
-      def determine_inheritance(item)
-        if item.material
-          fill_color = ColorUtils
-          # alpha =
-        end
-        {
-          alpha: 1.0,
-          hidden: false,
-          edge_color: ColorUtils.default_edge_color,
-          fill_color: ColorUtils.default_face_color
-        }
       end
 
       sig { returns(T::Boolean) }
@@ -93,8 +86,9 @@ module BreedloveDesign
           .collect { |p| Node.new(p, self) }
       end
 
-      sig { returns(NilClass) }
-      def parent()
+      sig { returns(T::Array[Sketchup::Face]) }
+      def get_faces
+        @parts.select { |part| part.is_a? Sketchup::Face }
       end
 
       sig { returns(NilClass) }
@@ -117,7 +111,6 @@ module BreedloveDesign
         params(
           faces: T::Array[Sketchup::Face],
           enclosing_tr: Geom::Transformation,
-          depth: Numeric,
           ent_id: String,
           inherited_color: String,
           groups_of_connected_front_facing_faces:
@@ -127,7 +120,6 @@ module BreedloveDesign
       def get_clumps(
         faces:,
         enclosing_tr:,
-        depth:,
         ent_id:,
         inherited_color:,
         groups_of_connected_front_facing_faces: []
@@ -148,11 +140,9 @@ module BreedloveDesign
             groups_of_connected_front_facing_faces << clump_of_front_faces
           end
           unprocessed_faces -= clump_of_front_faces
-          depth += 1
 
           get_clumps faces: unprocessed_faces,
                      enclosing_tr: enclosing_tr,
-                     depth: depth,
                      ent_id: ent_id,
                      inherited_color: inherited_color,
                      groups_of_connected_front_facing_faces:
@@ -161,6 +151,7 @@ module BreedloveDesign
           thing = groups_of_connected_front_facing_faces[0]
           if thing
             thing.sort_by! do |face|
+              puts "face.inspect: " + face.inspect
               [
                 Sorter.largest_z(face),
                 Sorter.largest_x(face),
@@ -168,8 +159,10 @@ module BreedloveDesign
               ]
             end
           else
+            puts "groups_of_connected_front_facing_faces.inspect: " +
+                   groups_of_connected_front_facing_faces.inspect
           end
-          clump_objects =
+          @clumps =
             groups_of_connected_front_facing_faces.collect do |group_of_faces|
               Clump.new(
                 faces: group_of_faces,
@@ -178,11 +171,9 @@ module BreedloveDesign
                 ent_id: ent_id
               )
             end
-          depth -= 1
-
-          return clump_objects
         end
       end
+
       sig { returns(NilClass) }
       def summary_outline()
       end

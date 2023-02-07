@@ -39,6 +39,8 @@ module BreedloveDesign
           @parts = item.definition.entities
           @tr = item.transformation
           @inherited_traits = @parent.inheritable_traits
+          @inheritable_traits =
+            Traits.new(item: item, inherited_traits: @inherited_traits)
           if item.name
             if item.name.length == 0
               @name =
@@ -91,20 +93,9 @@ module BreedloveDesign
         @parts.select { |part| part.is_a? Sketchup::Face }
       end
 
-      sig { returns(NilClass) }
+      sig { returns(T::Array[Node]) }
       def leaf_children()
-      end
-
-      sig { returns(NilClass) }
-      def made_aware?()
-      end
-
-      sig { returns(NilClass) }
-      def make_aware()
-      end
-
-      sig { returns(NilClass) }
-      def do_ancestry()
+        @children.select { |child| child.is_leaf? }
       end
 
       sig do

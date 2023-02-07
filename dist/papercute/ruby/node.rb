@@ -29,6 +29,8 @@ module BreedloveDesign
           @parts = item.definition.entities
           @tr = item.transformation
           @inherited_traits = @parent.inheritable_traits
+          @inheritable_traits =
+            Traits.new(item: item, inherited_traits: @inherited_traits)
           if item.name
             if item.name.length == 0
               @name =
@@ -83,18 +85,7 @@ module BreedloveDesign
 
 
       def leaf_children()
-      end
-
-
-      def made_aware?()
-      end
-
-
-      def make_aware()
-      end
-
-
-      def do_ancestry()
+        @children.select { |child| child.is_leaf? }
       end
 
 

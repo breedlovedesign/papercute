@@ -63,7 +63,7 @@ module BreedloveDesign
           alpha = ColorUtils.su_color_alpha_to_f(color_obj: material.color)
         else
           color = inherited_color
-          # TODO: inherited alpha
+          # TODO: use Traits to deal with color and only do projection here
           # alpha = 0.2
           alpha = 0.8
         end

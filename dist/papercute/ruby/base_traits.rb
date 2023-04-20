@@ -10,7 +10,7 @@ module BreedloveDesign
         @fill_color = ColorUtils.default_face_color
         # TODO: change alpha if rendering mode is set to X-ray
         @alpha = 1.0
-        @tr = Geom::Transformation.new(0, 0, 0)
+        @tr = IDENTITY
         @visible = true
       end
       attr_reader :fill_color, :tr, :edge_color, :alpha, :visible

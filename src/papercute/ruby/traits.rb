@@ -7,9 +7,10 @@ module BreedloveDesign
       sig do
         params(
           item: T.any(Sketchup::Group, Sketchup::ComponentInstance),
-          inherited_traits: Traits
+          inherited_traits: Traits,
         ).void
       end
+
       def initialize(item:, inherited_traits:)
         if item.material
           @fill_color = ColorUtils.material_to_color(item.material)
@@ -37,11 +38,14 @@ module BreedloveDesign
           # otherwise, inherit visiblity from parent
           @visible = inherited_traits.visible
         end
+        # @tr = inherited_traits.tr * item.transformation
+        @tr = item.transformation * inherited_traits.tr
       end
 
       attr_reader :fill_color, :tr, :edge_color, :alpha, :visible
 
       sig { returns(T::Boolean) }
+
       def color_by_material()
         # 1 = all same
         # 0 = by material

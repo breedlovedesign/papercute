@@ -5,6 +5,7 @@ module BreedloveDesign
       
       include ColorUtils
 
+
       def initialize(item:, inherited_traits:)
         if item.material
           @fill_color = ColorUtils.material_to_color(item.material)
@@ -32,9 +33,12 @@ module BreedloveDesign
           # otherwise, inherit visiblity from parent
           @visible = inherited_traits.visible
         end
+        # @tr = inherited_traits.tr * item.transformation
+        @tr = item.transformation * inherited_traits.tr
       end
 
       attr_reader :fill_color, :tr, :edge_color, :alpha, :visible
+
 
 
       def color_by_material()

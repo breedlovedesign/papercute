@@ -59,6 +59,22 @@ task :copy_icons do
   src_files.each { |src| cp src, dest_base }
 end
 
+desc "Copy html"
+
+task :copy_html do
+  dest_base = "dist/papercute/main_dialog/"
+  src_files = FileList["src/papercute/main_dialog/index.html"]
+  src_files.each { |src| cp src, dest_base }
+end
+
+desc "Copy css"
+
+task :copy_css do
+  dest_base = "dist/papercute/main_dialog/"
+  src_files = FileList["src/papercute/main_dialog/style.css"]
+  src_files.each { |src| cp src, dest_base }
+end
+
 desc "Replace sorbet sigil with frozen string literal"
 
 task :replace_sorbet_sigil_with_frozen_string_literal do

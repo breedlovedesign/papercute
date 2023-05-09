@@ -21,12 +21,12 @@ module BreedloveDesign
       UI
         .menu("extensions")
         .add_item("Papercute") do
-          begin
-            MainDialog.new
-          rescue => error
-            $stderr << error
-          end
+        begin
+          MainDialog.new
+        rescue => error
+          $stderr << error
         end
+      end
       toolbar = UI::Toolbar.new "Papercute"
       cmd = UI::Command.new("Papercute") { MainDialog.new }
       cmd.small_icon = File.join(PATH, "ruby", "ui_assets", "papercute_16.png")
@@ -36,9 +36,9 @@ module BreedloveDesign
       cmd.menu_text = "Papercute"
       toolbar = toolbar.add_item cmd
       if Sketchup.read_default(
-           "com.sketchup.SketchUp.2022",
-           "com.BreedloveDesign.Papercute.show_tb"
-         )
+        "com.sketchup.SketchUp.2022",
+        "com.BreedloveDesign.Papercute.show_tb"
+      )
         toolbar.show
       end
       file_loaded(__FILE__)

@@ -4,13 +4,21 @@ module BreedloveDesign
     class MainDialog
       extend T::Sig
       include Logger
+
       def initialize
-        dia = UI::HtmlDialog.new(options)
-        dia.set_url(html_url)
+        @settings = {
+          backgroundColor: background_color,
+          width: vpw,
+          height: vph,
+        }
+        html_dia = UI::HtmlDialog.new(options)
+        html_dia.set_url(html_url)
         # 30 and 26 pixels I arrived at by trial and error
-        dia.set_size(vpw, vph + 30 + 26)
-        dia.show
-        dia.set_on_closed do
+        html_dia.set_size(vpw, vph + 30 + 26)
+        setup_bridge(html_dia)
+        register_callbacks
+        @dia.show
+        @dia.set_on_closed do
           log "on close write toolbar visibility: #{UI::Toolbar.new("Papercute").visible?}",
               false
           Sketchup.write_default(
@@ -21,10 +29,33 @@ module BreedloveDesign
         end
       end
 
+      attr_reader :dia, :settings
+
       def rush_doll
       end
 
-      private
+      # private
+
+      def setup_bridge(html_dia)
+        @dia = Bridge.decorate(html_dia)
+      end
+
+      def register_callbacks
+        @dia.on("getBackgroundColor") { |deferred|
+          deferred.resolve(background_color)
+        }
+        @dia.on("settings") { |deferred|
+          deferred.resolve(@settings)
+        }
+      end
+
+      def su_opts
+        Sketchup.active_model.rendering_options
+      end
+
+      def background_color
+        ColorUtils.su_color_to_hex_str(color_obj: su_opts["BackgroundColor"])
+      end
 
       def vpw
         Sketchup.active_model.active_view.vpwidth
@@ -50,7 +81,7 @@ module BreedloveDesign
           {
             html_path: html_path,
             absolute_html_path: absolute_html_path,
-            html_url: html_url
+            html_url: html_url,
           },
           false
         )

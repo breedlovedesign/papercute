@@ -6,12 +6,25 @@
   <link rel="stylesheet" href="./style.css">
   <script type="text/javascript" src="./js/bridge.js"></script>
   <script type="text/javascript" src="./js/main_dialog.bundle.js"></script>
+  <script>
+    function setCanvasBackgroundColor() {
+      Bridge.get('getBackgroundColor')
+        .then(function (result) {
+          let canv = document.getElementById('canvas');
+          if (canv) {
+            canv.style.backgroundColor = result
+          } else {
+            console.log("Missing canvas?");
+          }
+        });
+    }
+  </script>
 </head>
 
 <body>
   <div id="controls">
-    <button onclick="renderAll()">Render</button>
-    <button onclick="test()">Test</button>
+    <button onclick="renderAll()">Render ⚡︎</button>
+    <button onclick="setCanvasBackgroundColor()">BG Color ⚡︎</button>
   </div>
   <canvas style="display: inline" id="canvas"></canvas>
 </body>

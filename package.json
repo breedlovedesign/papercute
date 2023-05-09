@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build_js": "webpack --progress",
     "build_ruby": "rake --trace",
-    "was_build":  "rake --trace && webpack --progress --mode=production --ignore-warnings-message /limit/"
+    "was_build":  "webpack --progress --mode=production --ignore-warnings-message /limit/"
   },
   "keywords": [],
   "private": true,

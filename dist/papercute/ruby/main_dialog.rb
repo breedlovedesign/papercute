@@ -7,7 +7,7 @@ module BreedloveDesign
 
       def initialize
         @settings = {
-          backgroundColor: background_color,
+          backgroundColor: provide_background_color,
           width: vpw,
           height: vph,
         }
@@ -41,19 +41,55 @@ module BreedloveDesign
       end
 
       def register_callbacks
+        #
+        # <callbackRegistration>
+        # @dia.on("<jsSide>") { |deferred|
+        #   deferred.resolve(<ruby_side>)
+        # }
+        # </callbackRegistration>
+        #
+        # 1. write the <callbackRegistration> here within #register_callbacks
+        # 2. write the ruby side 'here' entirely within a single method
+        #    denoted as <ruby_side> in the example above.
+        #    'here' refers to within MainDialog class AND main_dialog.rb file
+        #    Refactor the code out of this file and possibly out of this class
+        #    later?
+        # 3. write the javascript side in main_dialog/js/main_dialog.js,
+        #    denoted as <jsSide> in the example above. The method parameter
+        #    provided to #on MUST match the name of the corrosponding js
+        #    function, and OUGHT to follow js camelcase convention
+        #
+        #    Choosing good names: If ruby is acting as the server and
+        #    js is acting as the client as in the case of the background color,
+        #    follow the convention of choosing the name for the javascript side
+        #    to start with 'get' and the ruby side to start with 'provide'
+        #    Don't follow this convention blindly, think about which way the
+        #    user interaction and data flow are going
         @dia.on("getBackgroundColor") { |deferred|
-          deferred.resolve(background_color)
+          deferred.resolve(provide_background_color)
         }
         @dia.on("settings") { |deferred|
           deferred.resolve(@settings)
         }
+        @dia.on("getRenderData") { |deferred|
+          deferred.resolve(provide_render_data)
+        }
+      end
+
+
+
+      def provide_render_data
+        model_node = Node.new(Sketchup.active_model, nil)
+        model_node.clumps.collect do |clump|
+          clump.faces2d
+        end
       end
 
       def su_opts
         Sketchup.active_model.rendering_options
       end
 
-      def background_color
+      def provide_background_color
         ColorUtils.su_color_to_hex_str(color_obj: su_opts["BackgroundColor"])
       end
 

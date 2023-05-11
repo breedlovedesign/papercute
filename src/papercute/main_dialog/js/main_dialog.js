@@ -16,6 +16,17 @@ export function setCanvasBackgroundColor() {
       }
     });
 }
+// notice the exported function's name can, but is not required to
+// match the parameter provided to Bridge.get
+// this doesn't look DRY, Bridge.get('getRenderData'), get get?
+// true enough but getRenderData has to appear on the ruby side
+// as well, and there it is very helpful to emphasize
+export function logRenderData() {
+  Bridge.get('getRenderData')
+    .then(function (result) {
+        console.log(result);
+    });
+}
 
 
 // ready to go, var paper = PaperCore FTW! (and paper.Raster)

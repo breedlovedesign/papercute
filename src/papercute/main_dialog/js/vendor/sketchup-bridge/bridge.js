@@ -12,6 +12,7 @@ function isSketchUp() {
 }
 
 function isSketchUpHtmDialog() {
+  // @ts-ignore
   return typeof window !== 'undefined' && typeof window.sketchup !== 'undefined'
 }
 
@@ -156,6 +157,7 @@ if (isSketchUp()) {
 }
 const Bridge = new BridgeClass(requestHandler)
 // Make Promise (evt. polyfilled) available under Bridge for consistency with Ruby code.
+// @ts-ignore
 Bridge.Promise = Promise
 // Ensure the export is globally available since required by SketchUp Bridge Ruby backend
 if (isSketchUp()) global.Bridge = Bridge

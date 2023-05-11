@@ -6,6 +6,7 @@ module BreedloveDesign
       include Projection2d
 
 
+
       def initialize(faces:, inherited_traits:, ent_id:)
         @ent_id = ent_id
         @faces = faces
@@ -16,6 +17,7 @@ module BreedloveDesign
         @center = bounds.center.transform(@tr)
         @faces2d = sets_of_pts_2d.collect(&:to_h)
       end
+
 
 
       def get_clumps(
@@ -32,8 +34,8 @@ module BreedloveDesign
           clump_of_front_faces =
             clump_of_faces.reject { |face| Sorter.rear_facing?(face, @tr) }
           unless groups_of_connected_front_facing_faces.include?(
-                   clump_of_front_faces
-                 )
+            clump_of_front_faces
+          )
             groups_of_connected_front_facing_faces << clump_of_front_faces
           end
           unprocessed_faces -= clump_of_front_faces
@@ -42,8 +44,7 @@ module BreedloveDesign
           get_clumps faces: unprocessed_faces,
                      depth: depth,
                      ent_id: ent_id,
-                     groups_of_connected_front_facing_faces:
-                       groups_of_connected_front_facing_faces
+                     groups_of_connected_front_facing_faces: groups_of_connected_front_facing_faces
         else
           thing = groups_of_connected_front_facing_faces[0]
           if thing
@@ -51,7 +52,7 @@ module BreedloveDesign
               [
                 Sorter.largest_z(face),
                 Sorter.largest_x(face),
-                Sorter.largest_y(face)
+                Sorter.largest_y(face),
               ]
             end
           else
@@ -61,7 +62,7 @@ module BreedloveDesign
               Clump.new(
                 faces: group_of_faces,
                 inherited_traits: @inherited_traits,
-                ent_id: ent_id
+                ent_id: ent_id,
               )
             end
           depth -= 1
@@ -77,6 +78,7 @@ module BreedloveDesign
       end
 
       attr_reader :faces2d, :center
+
 
 
       def sets_of_pts_2d # rename to reflect data structure?
@@ -122,7 +124,7 @@ module BreedloveDesign
       def inspect
         "clump_ent: #{@ent_id}\n" + "clump_obj_id: #{self.object_id}\n" +
           "face count: #{@faces.length}\n" +
-          "faces:\n   #{@faces2d.pretty_inspect}"
+          "faces:\n   #{@faces2d.inspect}"
       end
     end # class Clump
   end # module Papercute

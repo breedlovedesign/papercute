@@ -17,6 +17,7 @@ module BreedloveDesign
 
       def initialize(item, parent)
         @item = item
+        @clumps = T.let([], T::Array[Clump])
         case item
         when Sketchup::Model
           @parts = item.entities
@@ -68,7 +69,13 @@ module BreedloveDesign
         @name = "model" if @name == "model_" && @children.count == 0
       end
 
-      attr_reader :children, :inheritable_traits, :tr, :total_tr, :name, :clumps
+      sig { returns(T::Array[BreedloveDesign::Papercute::Clump]) }
+
+      def clumps()
+        @clumps
+      end
+
+      attr_reader :children, :inheritable_traits, :tr, :total_tr, :name
       sig { returns(T::Boolean) }
 
       def is_leaf?()
@@ -155,6 +162,7 @@ module BreedloveDesign
             puts "groups_of_connected_front_facing_faces.inspect: " +
                    groups_of_connected_front_facing_faces.inspect
           end
+
           @clumps =
             groups_of_connected_front_facing_faces.collect do |group_of_faces|
               Clump.new(

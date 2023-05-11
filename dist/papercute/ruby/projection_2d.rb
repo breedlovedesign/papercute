@@ -11,8 +11,9 @@ module BreedloveDesign
           :fill_color,
           :edge_color,
           :alpha,
-          keyword_init: true
+          keyword_init: true,
         )
+
 
 
       def loop_to_pts_2d(a_loop, tr)
@@ -44,11 +45,13 @@ module BreedloveDesign
         return screen_positions
       end
 
+
+
       def prepare_face(face, tr)
         prepped_face =
           PreparedFace.new(
             outer_loop_points: loop_to_pts_2d(face.outer_loop, tr),
-            inner_loops: []
+            inner_loops: [],
           )
 
         inner_loops = face.loops - [face.outer_loop]

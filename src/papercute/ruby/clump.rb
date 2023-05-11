@@ -9,9 +9,10 @@ module BreedloveDesign
         params(
           faces: T::Array[Sketchup::Face],
           inherited_traits: Traits,
-          ent_id: String
+          ent_id: String,
         ).void
       end
+
       def initialize(faces:, inherited_traits:, ent_id:)
         @ent_id = ent_id
         @faces = faces
@@ -20,7 +21,7 @@ module BreedloveDesign
         bounds = Geom::BoundingBox.new
         @faces.each { |f| bounds.add f.bounds }
         @center = bounds.center.transform(@tr)
-        @faces2d = sets_of_pts_2d.collect(&:to_h)
+        @faces2d = T.let(sets_of_pts_2d.collect(&:to_h), T::Array[T::Hash[Symbol, T.untyped]])
       end
 
       sig do
@@ -28,10 +29,10 @@ module BreedloveDesign
           faces: T::Array[Sketchup::Face],
           depth: Numeric,
           ent_id: String,
-          groups_of_connected_front_facing_faces:
-            T::Array[T::Array[Sketchup::Face]]
+          groups_of_connected_front_facing_faces: T::Array[T::Array[Sketchup::Face]],
         ).returns(T::Array[BreedloveDesign::Papercute::Clump])
       end
+
       def get_clumps(
         faces:,
         depth:,
@@ -46,8 +47,8 @@ module BreedloveDesign
           clump_of_front_faces =
             clump_of_faces.reject { |face| Sorter.rear_facing?(face, @tr) }
           unless groups_of_connected_front_facing_faces.include?(
-                   clump_of_front_faces
-                 )
+            clump_of_front_faces
+          )
             groups_of_connected_front_facing_faces << clump_of_front_faces
           end
           unprocessed_faces -= clump_of_front_faces
@@ -56,8 +57,7 @@ module BreedloveDesign
           get_clumps faces: unprocessed_faces,
                      depth: depth,
                      ent_id: ent_id,
-                     groups_of_connected_front_facing_faces:
-                       groups_of_connected_front_facing_faces
+                     groups_of_connected_front_facing_faces: groups_of_connected_front_facing_faces
         else
           thing = groups_of_connected_front_facing_faces[0]
           if thing
@@ -65,7 +65,7 @@ module BreedloveDesign
               [
                 Sorter.largest_z(face),
                 Sorter.largest_x(face),
-                Sorter.largest_y(face)
+                Sorter.largest_y(face),
               ]
             end
           else
@@ -75,7 +75,7 @@ module BreedloveDesign
               Clump.new(
                 faces: group_of_faces,
                 inherited_traits: @inherited_traits,
-                ent_id: ent_id
+                ent_id: ent_id,
               )
             end
           depth -= 1
@@ -93,6 +93,7 @@ module BreedloveDesign
       attr_reader :faces2d, :center
 
       sig { returns(T::Array[Projection2d::PreparedFace]) }
+
       def sets_of_pts_2d # rename to reflect data structure?
         @faces.collect do |face|
           prepped_face = prepare_face(face, @tr)
@@ -136,7 +137,7 @@ module BreedloveDesign
       def inspect
         "clump_ent: #{@ent_id}\n" + "clump_obj_id: #{self.object_id}\n" +
           "face count: #{@faces.length}\n" +
-          "faces:\n   #{@faces2d.pretty_inspect}"
+          "faces:\n   #{@faces2d.inspect}"
       end
     end # class Clump
   end # module Papercute

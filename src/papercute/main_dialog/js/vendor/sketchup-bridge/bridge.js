@@ -1,5 +1,5 @@
 // import RequestHandler from './request-handler.js'
-import WebDialogRequestHandler from './request-handler-webdialog.js'
+// import WebDialogRequestHandler from './request-handler-webdialog.js'
 import HtmlDialogRequestHandler from './request-handler-htmldialog.js'
 import BrowserPromptRequestHandler from './request-handler-browser-prompt.js'
 
@@ -149,7 +149,7 @@ if (isSketchUp()) {
   if (isSketchUpHtmDialog()) {
     requestHandler = new HtmlDialogRequestHandler()
   } else {
-    requestHandler = new WebDialogRequestHandler(window.location)
+    // requestHandler = new WebDialogRequestHandler(window.location)
   }
 } else {
   requestHandler = new BrowserPromptRequestHandler()

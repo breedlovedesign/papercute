@@ -7,8 +7,9 @@ module.exports = {
     main: './src/papercute/main_dialog/js/main_dialog.js',
   },
   output: {
+    library: 'PaperCute',
     path: path.resolve(__dirname, 'dist/papercute/main_dialog/js'),
     filename: 'main_dialog.bundle.js',
-    // clean: true,
-  },
+    clean: true,
+  }
 };

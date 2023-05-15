@@ -4,6 +4,22 @@ import PaperCore from "paper"
 console.log("Hello from PaperJS")
 console.log(PaperCore.version)
 
+// write a support function here not exported but used in
+// an exported function below
+/**
+ * @param {Object} renderData
+ */
+function drawStuff(renderData) {
+  console.log(renderData)
+}
+
+/**
+ * @param {Array} item
+ */
+function mkpt(item) {
+  return new paper.Point(item)
+}
+
 
 export function setCanvasBackgroundColor() {
   Bridge.get('getBackgroundColor')
@@ -24,10 +40,19 @@ export function setCanvasBackgroundColor() {
 export function logRenderData() {
   Bridge.get('getRenderData')
     .then(function (result) {
+        console.log("\n");
         console.log(result);
     });
 }
 
+export function renderToPaper() {
+  Bridge.get('getRenderData').then(
+    function (renderData) {
+      drawStuff(renderData);
+        console.log("end renderToPaper");
+    }
+  )
+}
 
 // ready to go, var paper = PaperCore FTW! (and paper.Raster)
 function initLibs() {

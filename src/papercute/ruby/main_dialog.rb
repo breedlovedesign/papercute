@@ -80,9 +80,8 @@ module BreedloveDesign
 
       def provide_render_data
         model_node = Node.new(Sketchup.active_model, nil)
-        model_node.clumps.collect do |clump|
-          clump.faces2d
-        end
+        render_data = model_node.provide_js_ready_model_data
+        return render_data
       end
 
       def su_opts

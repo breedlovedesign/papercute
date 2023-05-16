@@ -6,11 +6,6 @@ module BreedloveDesign
       include Logger
 
       def initialize
-        @settings = {
-          backgroundColor: provide_background_color,
-          width: vpw,
-          height: vph,
-        }
         html_dia = UI::HtmlDialog.new(options)
         html_dia.set_url(html_url)
         # 30 and 26 pixels I arrived at by trial and error
@@ -29,7 +24,15 @@ module BreedloveDesign
         end
       end
 
-      attr_reader :dia, :settings
+      attr_reader :dia
+
+      def settings
+        {
+          backgroundColor: provide_background_color,
+          width: vpw,
+          height: vph,
+        }
+      end
 
       def rush_doll
       end
@@ -69,7 +72,7 @@ module BreedloveDesign
           deferred.resolve(provide_background_color)
         }
         @dia.on("settings") { |deferred|
-          deferred.resolve(@settings)
+          deferred.resolve(settings)
         }
         @dia.on("getRenderData") { |deferred|
           deferred.resolve(provide_render_data)
@@ -81,6 +84,7 @@ module BreedloveDesign
       def provide_render_data
         model_node = Node.new(Sketchup.active_model, nil)
         render_data = model_node.provide_js_ready_model_data
+
         return render_data
       end
 

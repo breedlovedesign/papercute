@@ -6,10 +6,10 @@ module BreedloveDesign
 
       PreparedFace =
         Struct.new(
-          :outer_loop_points,
-          :inner_loops,
-          :fill_color,
-          :edge_color,
+          :outerLoopPoints,
+          :innerLoops,
+          :fillColor,
+          :edgeColor,
           :alpha,
           keyword_init: true,
         )
@@ -54,14 +54,14 @@ module BreedloveDesign
       def prepare_face(face, tr)
         prepped_face =
           PreparedFace.new(
-            outer_loop_points: loop_to_pts_2d(face.outer_loop, tr),
-            inner_loops: [],
+            outerLoopPoints: loop_to_pts_2d(face.outer_loop, tr),
+            innerLoops: [],
           )
 
         inner_loops = face.loops - [face.outer_loop]
         return prepped_face if inner_loops.empty?
         inner_loops.collect do |inner_loop|
-          prepped_face[:inner_loops] << loop_to_pts_2d(inner_loop, tr)
+          prepped_face[:innerLoops] << loop_to_pts_2d(inner_loop, tr)
         end
         prepped_face
       end

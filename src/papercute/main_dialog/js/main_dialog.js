@@ -1,119 +1,217 @@
 import Bridge from "./vendor/sketchup-bridge/bridge"
 import PaperCore from "paper"
 
-console.log("Hello from PaperJS")
-console.log(PaperCore.version)
+// console.log("Hello from PaperJS")
+// console.log(PaperCore.version)
 
-function renderClump(clump) {
-  let saved_for_union = []
-  for (let face of clump) {
-    let obj = { "children": [] };
-    let data = face.outer_loop_points;
-    let olSegs = data.map(mkpt);
-    let olPath = new paper.Path(olSegs);
-    olPath.strokeColor = 'black';
-    olPath.fillColor = 'green';
-    olPath.closed = true;
-    obj[ "children" ].push(olPath);
-    let inners = face.inner_loops;
-    for (let inner of inners) {
-      let ilSegs = inner.map(mkpt);
-      let ilPath = new paper.Path(ilSegs);
-      ilPath.closed = true;
-      obj.children.push(ilPath);
-    };
-    obj[ "fillColor" ] = face.fill_color;
-    obj[ "strokeColor" ] = face.edge_color;
-    console.log(`strokeColor: ${obj["strokeColor"]}`)
-    let cpath = new paper.CompoundPath(obj);
-    cpath.fillColor.alpha = face.alpha;
-    cpath.strokeWidth = 4;
-    cpath.strokeCap = 'round';
-    cpath.strokeJoin = 'round';
-    // hoverJitter(cpath, -10, -10);
-    saved_for_union.push(cpath);
-  }
-
-
-  if (saved_for_union.length == 1){
-    // console.log('one')
-    var union_item = saved_for_union[0].clone({insert: true, deep: true})
-  } else {
-    console.log('more than one')
-    var union_item = saved_for_union.reduce(unionize);
-  }
-  union_item.strokeWidth = 7;
-  union_item.strokeColor = "#ffff00";
-  let clump_group = new Group(saved_for_union);
-  union_item.insertBelow(saved_for_union[ 0 ]);
-  let partial_union_item = union_item.clone({ insert: true, deep: true })
-  partial_union_item.strokeColor = ("orange");
-  // partial_union_item.fillColor = "#f00"
-  // hoverJitter(partial_union_item, 2, -2)
-  // hoverJitter(union_item, -5, 2)
-  let clump_results = { "clump_group": clump_group, "partial_union_item": partial_union_item }
-  // console.log("clump_results:")
-  // console.log(clump_results)
-  // console.log("")
-  return (clump_results)
-}
-
-function renderNode(node) {
-  let children = node[ "children" ];
-  let saved_for_node_group = [];
-  let saved_for_node_union = [];
-  children.forEach(function (child) {
-    node_results = renderNode(child);
-    saved_for_node_group.push(node_results[ "node_wide_group" ]);
-    saved_for_node_union.push(node_results[ "node_wide_partial_union_item" ]);
-  })
-  var clumps = node[ 'clumps' ];
-  clumps.forEach(function (clump) {
-    let clump_results = renderClump(clump);
-    // saved_for_union is just getting the outlines of clumps
-    saved_for_node_group.push(clump_results[ "clump_group" ]);
-    saved_for_node_union.push(clump_results[ "partial_union_item" ]);
-  })
-  var node_group = new Group(saved_for_node_group);
-  let node_wide_union_item = saved_for_node_union.reduce(unionize);
-  node_wide_union_item.strokeWidth = 21;
-  node_wide_union_item.strokeColor = "#cf3300";
-  // hoverJitter(node_wide_union_item, 3,3);
-  console.log("");
-  console.log("node_wide_union_item:");
-  console.log(node_wide_union_item);
-  let last_in_stack = saved_for_node_union[ 0 ];
-  console.log("last_in_stack:");
-  console.log(last_in_stack);
-  console.log("");
-  node_wide_union_item.insertBelow(last_in_stack);
-  let node_wide_partial_union_item = node_wide_union_item.clone({ insert: false, deep: true });
-  // node_wide_partial_union_item.st
-  return { "node_wide_partial_union_item": node_wide_partial_union_item, "node_wide_group": node_group }
-}
-
-function drawStuff(renderData) {
-  console.log(renderData)
+/**
+ * @param  {paper.PathItem} returned
+ * @param  {paper.PathItem} faceToAdd
+ */
+function unionize(returned, faceToAdd) {
+    return returned.unite(faceToAdd, { insert: false });
 }
 
 /**
- * @param {Array} item
+ * @param  {Clump} clump
  */
-function mkpt(item) {
-  return new paper.Point(item)
+function renderClump(clump) {
+    /** @var { paper.Path[]} savedForUnion */
+    let savedForUnion = []
+    for (let face of clump) {
+        /** @type {{ children: paper.Path[]}} */
+        let obj = { children: [] };
+        let data = face.outerLoopPoints;
+        /**
+         * @var  {paper.Point[]} outerLoopSegments
+         */
+        let outerLoopSegments = data.map(mkpt);
+        let outerLoopPath = new paper.Path(outerLoopSegments);
+        // All properties and functions that expect color values in the form
+        // of instances of paper.Color objects, also accept named colors and hex
+        // values as strings which are then converted to instances of Color internally.
+        // @ts-ignore
+        outerLoopPath.strokeColor = face.edgeColor;
+        // @ts-ignore
+        outerLoopPath.fillColor = face.fillColor;
+        outerLoopPath.closed = true;
+        // console.log(face)
+        obj[ "children" ].push(outerLoopPath);
+        face.innerLoops.forEach(function (innerLoop) {
+            let innerLoopSegments = innerLoop.map(mkpt);
+            let innerLoopPath = new paper.Path(innerLoopSegments);
+            innerLoopPath.closed = true;
+            obj.children.push(innerLoopPath);
+        });
+
+        obj[ "fillColor" ] = face.fillColor;
+        obj[ "strokeColor" ] = face.edgeColor;
+        // console.log(`strokeColor: ${obj[ "strokeColor" ]}`)
+        /** @var {paper.pathItem} cpath */
+        let cpath = new paper.CompoundPath(obj);
+        let colorObject = new paper.Color(face.fillColor)
+        cpath[ "fillColor" ] = colorObject;
+        cpath.fillColor.alpha = face.alpha;
+        // console.log(`fillColor: ${colorObject}`)
+
+        cpath.strokeWidth = 4;
+        cpath.strokeCap = 'round';
+        cpath.strokeJoin = 'round';
+        // hoverJitter(cpath, -10, -10);
+        savedForUnion.push(cpath);
+    }
+
+    if (savedForUnion.length == 0) {
+        console.log('zero')
+        console.log(savedForUnion[ 0 ])
+        var unionItem = savedForUnion[ 0 ].clone({ insert: true, deep: true })
+    } else if (savedForUnion.length == 1) {
+        // console.log('one')
+        // console.log(savedForUnion[ 0 ])
+        var unionItem = savedForUnion[ 0 ].clone({ insert: true, deep: true })
+    } else {
+        // console.log('more than one')
+        // console.log(savedForUnion)
+        var unionItem = savedForUnion.reduce((previousValue, currentValue, currentIndex, array) => {
+            // console.log(previousValue);
+            // console.log(currentValue);
+            // console.log(currentIndex);
+            // console.log(array);
+
+            return unionize(previousValue, currentValue)
+        });
+    }
+    unionItem.strokeWidth = 7;
+    var colorObject = new paper.Color("#ffff00");
+    unionItem.strokeColor = colorObject;
+    let clumpGroup = new paper.Group(savedForUnion);
+    unionItem.insertBelow(savedForUnion[ 0 ]);
+    let partialUnionItem = unionItem.clone({ insert: true, deep: true })
+
+    var colorObject = new paper.Color("orange");
+    partialUnionItem.strokeColor = colorObject;
+    // partialUnionItem.fillColor = "#f00"
+    // hoverJitter(partialUnionItem, 2, -2)
+    // hoverJitter(unionItem, -5, 2)
+    let clumpResults = { "clumpGroup": clumpGroup, "partialUnionItem": partialUnionItem }
+    // console.log("clumpResults:")
+    // console.log(clumpResults)
+    // console.log("")
+    return (clumpResults)
 }
 
+/**
+ * @param  {PaperCuteNode} node
+ * @returns nodeGroup
+ */
+function renderNode(node) {
+    let children = node[ "children" ];
+    let savedForNodeGroup = [];
+    let savedForNodeUnion = [];
+    children.forEach(function (child) {
+        let nodeResults = renderNode(child);
+        savedForNodeGroup.push(nodeResults[ "nodeWideGroup" ]);
+        savedForNodeUnion.push(nodeResults[ "nodeWidePartialUnionItem" ]);
+    })
+    var clumps = node[ 'clumps' ];
+    clumps.forEach(function (clump) {
+        let clumpResults = renderClump(clump);
+        // savedForUnion is just getting the outlines of clumps
+        savedForNodeGroup.push(clumpResults[ "clumpGroup" ]);
+        savedForNodeUnion.push(clumpResults[ "partialUnionItem" ]);
+    })
+    var nodeGroup = new paper.Group(savedForNodeGroup);
+
+    if (savedForNodeUnion.length == 0) {
+        console.log('zero')
+        console.log(savedForNodeUnion[ 0 ])
+        var nodeWideUnionItem = savedForNodeUnion[ 0 ].clone({ insert: true, deep: true })
+    } else if (savedForNodeUnion.length == 1) {
+        // console.log('one')
+        // console.log(savedForNodeUnion[ 0 ])
+        var nodeWideUnionItem = savedForNodeUnion[ 0 ].clone({ insert: true, deep: true })
+    } else {
+        // console.log('more than one')
+        // console.log(savedForNodeUnion)
+        var nodeWideUnionItem = savedForNodeUnion.reduce((previousValue, currentValue, currentIndex, array) => {
+            // console.log(previousValue);
+            // console.log(currentValue);
+            // console.log(currentIndex);
+            // console.log(array);
+
+            return unionize(previousValue, currentValue)
+        });
+    }
+
+
+    nodeWideUnionItem.strokeWidth = 21;
+    nodeWideUnionItem.strokeColor = "#cf3300";
+    // hoverJitter(nodeWideUnionItem, 3,3);
+    // console.log("");
+    // console.log("nodeWideUnionItem:");
+    // console.log(nodeWideUnionItem);
+    let lastInStack = savedForNodeUnion[ 0 ];
+    // console.log("lastInStack:");
+    // console.log(lastInStack);
+    // console.log("");
+    nodeWideUnionItem.insertBelow(lastInStack);
+    let nodeWidePartialUnionItem = nodeWideUnionItem.clone({ insert: false, deep: true });
+    var renderNodeOutput = { "nodeWidePartialUnionItem": nodeWidePartialUnionItem, "nodeWideGroup": nodeGroup }
+    return renderNodeOutput
+}
+/**
+* Represents a 2D point as an array.
+* @typedef {number[]} Point - [x,y]
+*/
+
+/**
+* Represents a polyline with a minimum of 3 vertices.
+* @typedef {Point[]} Polyline
+*/
+
+/**
+* Represents a face.
+* @typedef {Object} Face - represents a 2D projection of a SketchUp Face
+* @property {Polyline} outerLoopPoints - the outline of the shape
+* @property {Polyline[]} innerLoops - zero or more holes in the outerloop
+* @property {Number} alpha - 0.0 to 1.0, transparent to opaque
+* @property {String} edgeColor - '#FF0000' for example
+* @property {String} fillColor - '#FF0000' for example
+*/
+
+/**
+* Represents a Clump, which is a set of contiguous faces within a Model,
+* Group, or ComponentInstance
+* @typedef  {Face[]} Clump
+*/
+
+/**
+* Nodes unifiy SketchUp Models, Groups, and ComponentInstances for
+* the purpose of rendering in 2D
+* @typedef {Object} PaperCuteNode
+* @property {PaperCuteNode[]} children
+* @property {Clump[]} clumps - An array of <Clump>
+* @property {String} nodeEdgeColor - '#FF0000' for example
+* @property {String} nodeFillColor - '#FF0000' for example
+/*
+
+/**
+* @param {Point} pt
+*/
+function mkpt(pt) {
+    return new paper.Point(pt)
+}
 
 export function setCanvasBackgroundColor() {
-  Bridge.get('getBackgroundColor')
-    .then(function (result) {
-      let canv = document.getElementById('canvas');
-      if (canv) {
-        canv.style.backgroundColor = result
-      } else {
-        console.log("Missing canvas?");
-      }
-    });
+    Bridge.get('getBackgroundColor')
+        .then(function (result) {
+            let canv = document.getElementById('canvas');
+            if (canv) {
+                canv.style.backgroundColor = result
+            } else {
+                console.log("Missing canvas?");
+            }
+        });
 }
 // notice the exported function's name can, but is not required to
 // match the parameter provided to Bridge.get
@@ -121,44 +219,48 @@ export function setCanvasBackgroundColor() {
 // true enough but getRenderData has to appear on the ruby side
 // as well, and there it is very helpful to emphasize
 export function logRenderData() {
-  Bridge.get('getRenderData')
-    .then(function (result) {
-        console.log("\n");
-        console.log(result);
-    });
+    Bridge.get('getRenderData')
+        .then(function (result) {
+            // console.log("\n");
+            // console.log(result);
+        });
 }
 
 export function renderToPaper() {
-  Bridge.get('getRenderData').then(
-    function (renderData) {
-      drawStuff(renderData);
-        console.log("end renderToPaper");
-    }
-  )
+    Bridge.get('getRenderData')
+        .then(
+            /**
+             * @param {PaperCuteNode} renderData
+             */
+            function (renderData) {
+                // console.log(renderData)
+                renderNode(renderData);
+                // console.log("end renderToPaper");
+            });
 }
 
 // ready to go, var paper = PaperCore FTW! (and paper.Raster)
 function initLibs() {
-  console.log("initialized PaperJS")
-  let canvas = document.getElementsByTagName("canvas")[ 0 ];
-  Bridge.get('settings').then(function (settings) {
-    var paper = PaperCore
-    canvas.width = settings.width;
-    canvas.height = settings.height;
-    canvas.style.backgroundColor = settings.backgroundColor;
-    paper.install(window);
-    paper.setup('canvas');
-    var vector_layer = new paper.Layer({ "name": 'vector_layer' });
-    vector_layer.activate();
-    // renderAll();
+    // console.log("initialized PaperJS")
+    let canvas = document.getElementsByTagName("canvas")[ 0 ];
+    Bridge.get('settings').then(function (settings) {
+        var paper = PaperCore
+        canvas.width = settings.width;
+        canvas.height = settings.height;
+        canvas.style.backgroundColor = settings.backgroundColor;
+        paper.install(window);
+        paper.setup('canvas');
+        var vectorLayer = new paper.Layer({ "name": 'vectorLayer' });
+        vectorLayer.activate();
+        // renderAll();
 
-  }).then(function () {
-    // injectRasterToCanvas() // toggled off to facilitate evaluation of grouping and line width shenanigans
-  })
+    }).then(function () {
+        // injectRasterToCanvas() // toggled off to facilitate evaluation of grouping and line width shenanigans
+    })
 }
 
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initLibs);
+    document.addEventListener('DOMContentLoaded', initLibs);
 } else {
-  initLibs();
+    initLibs();
 }

@@ -85,14 +85,14 @@ module BreedloveDesign
         @faces.collect do |face|
           prepped_face = prepare_face(face, @tr)
           if face.material
-            prepped_face.fill_color =
+            prepped_face.fillColor =
               ColorUtils.material_to_color(face.material)
-            prepped_face.edge_color = ColorUtils.default_edge_color # sort out edges later
+            prepped_face.edgeColor = ColorUtils.default_edge_color # sort out edges later
             prepped_face.alpha =
               ColorUtils.su_color_alpha_to_f(color_obj: face.material.color)
           else
-            prepped_face.fill_color = @inherited_traits.fill_color
-            prepped_face.edge_color = @inherited_traits.edge_color
+            prepped_face.fillColor = @inherited_traits.fill_color
+            prepped_face.edgeColor = @inherited_traits.edge_color
             prepped_face.alpha = @inherited_traits.alpha
           end
           # ec = ColorUtils.default_edge_color

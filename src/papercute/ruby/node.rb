@@ -220,15 +220,15 @@ module BreedloveDesign
         clumps = @clumps.collect do |clump|
           clump.faces2d
         end
-        node_fill_color = @inherited_traits.fill_color
+        node_face_color = @inherited_traits.fill_color
         node_edge_color = @inherited_traits.edge_color
         children = @children.collect do |child_node|
           child_node.provide_js_ready_model_data
         end
         {
           clumps: clumps,
-          node_face_color: node_fill_color,
-          node_edge_color: node_edge_color,
+          nodeFillColor: node_face_color,
+          nodeEdgeColor: node_edge_color,
           children: children,
         }
       end

@@ -14,6 +14,7 @@ module BreedloveDesign
       def initialize(item:, inherited_traits:)
         if item.material
           @fill_color = ColorUtils.material_to_color(item.material)
+          # make alpha inheritable and dependant on xray setting
           @alpha =
             ColorUtils.su_color_alpha_to_f(color_obj: item.material.color)
           if color_by_material
@@ -40,9 +41,10 @@ module BreedloveDesign
         end
         # @tr = inherited_traits.tr * item.transformation
         @tr = item.transformation * inherited_traits.tr
+        @inhreted_tr = inherited_traits.tr
       end
 
-      attr_reader :fill_color, :tr, :edge_color, :alpha, :visible
+      attr_reader :fill_color, :tr, :edge_color, :alpha, :visible, :inhreted_tr
 
       sig { returns(T::Boolean) }
 

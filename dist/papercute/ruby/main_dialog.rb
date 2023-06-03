@@ -6,6 +6,7 @@ module BreedloveDesign
       include Logger
 
       def initialize
+        $eazy = Node.new(Sketchup.active_model, nil)
         html_dia = UI::HtmlDialog.new(options)
         html_dia.set_url(html_url)
         # 30 and 26 pixels I arrived at by trial and error
@@ -31,6 +32,8 @@ module BreedloveDesign
           backgroundColor: provide_background_color,
           width: vpw,
           height: vph,
+          # x_ray: false,
+          x_ray: true,
         }
       end
 
@@ -38,6 +41,8 @@ module BreedloveDesign
       end
 
       # private
+
+
 
       def setup_bridge(html_dia)
         @dia = Bridge.decorate(html_dia)

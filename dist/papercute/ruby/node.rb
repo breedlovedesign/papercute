@@ -50,8 +50,10 @@ module BreedloveDesign
           get_clumps(
             faces: @faces,
             enclosing_tr: inheritable_traits.tr,
+            # enclosing_tr: inheritable_traits.tr,
             ent_id: @name,
             inherited_color: @inheritable_traits.fill_color,
+            # inherited_color: @inheritable_traits.fill_color,
           )
         end
 

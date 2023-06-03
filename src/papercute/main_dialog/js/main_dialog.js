@@ -1,10 +1,14 @@
 import Bridge from "./vendor/sketchup-bridge/bridge"
 import PaperCore from "paper"
 
+// TODO: get node-wide unions to render for all nodes, not just the last node processed
+// TODO: sort out transformation code in ruby so stuff ends up in the right places
+
 // console.log("Hello from PaperJS")
 // console.log(PaperCore.version)
 
 /**
+ * Creates, but does not insert, a PaperJS polyline
  * @param  {paper.PathItem} returned
  * @param  {paper.PathItem} faceToAdd
  */
@@ -13,15 +17,23 @@ function unionize(returned, faceToAdd) {
 }
 
 /**
+ * This does 3 things. Please refactor.
+ * 1. renders each face of a clump to a polyline
+ * 2. boolean unions those faces to a new polyline
+ * 3. delivers the output to be used in further boolean operations
  * @param  {Clump} clump
+ * @param  {paper.Color} ambientFillColor
+ * @param  {paper.Color} ambientEdgeColor
+ * @param  {Number} ambientAlpha
  */
-function renderClump(clump) {
-    /** @var { paper.Path[]} savedForUnion */
+function renderClump(clump, ambientFillColor, ambientEdgeColor, ambientAlpha) {
+    /** @var { paper.Path[] } savedForUnion */
     let savedForUnion = []
     for (let face of clump) {
-        /** @type {{ children: paper.Path[]}} */
+        /** @type {{ children: paper.Path[] }} */
         let obj = { children: [] };
         let data = face.outerLoopPoints;
+        let clumpDefaultFillColor = ambientFillColor
         /**
          * @var  {paper.Point[]} outerLoopSegments
          */
@@ -52,6 +64,7 @@ function renderClump(clump) {
         let colorObject = new paper.Color(face.fillColor)
         cpath[ "fillColor" ] = colorObject;
         cpath.fillColor.alpha = face.alpha;
+        // cpath.fillColor.alpha = 0.1;
         // console.log(`fillColor: ${colorObject}`)
 
         cpath.strokeWidth = 4;
@@ -61,35 +74,29 @@ function renderClump(clump) {
         savedForUnion.push(cpath);
     }
 
-    if (savedForUnion.length == 0) {
-        console.log('zero')
-        console.log(savedForUnion[ 0 ])
-        var unionItem = savedForUnion[ 0 ].clone({ insert: true, deep: true })
-    } else if (savedForUnion.length == 1) {
-        // console.log('one')
-        // console.log(savedForUnion[ 0 ])
-        var unionItem = savedForUnion[ 0 ].clone({ insert: true, deep: true })
-    } else {
-        // console.log('more than one')
-        // console.log(savedForUnion)
-        var unionItem = savedForUnion.reduce((previousValue, currentValue, currentIndex, array) => {
-            // console.log(previousValue);
-            // console.log(currentValue);
-            // console.log(currentIndex);
-            // console.log(array);
-
+    if (savedForUnion.length > 1) {
+        console.log('clump savedForUnion length more than one')
+        console.log(savedForUnion)
+        // @ts-ignore
+        var unionItem = savedForUnion.reduce((previousValue, currentValue) => {
             return unionize(previousValue, currentValue)
         });
+    } else {
+        console.log('clump savedForUnion length one')
+        console.log(savedForUnion[ 0 ])
+        var unionItem = savedForUnion[ 0 ].clone({ insert: true, deep: true })
     }
     unionItem.strokeWidth = 7;
-    var colorObject = new paper.Color("#ffff00");
-    unionItem.strokeColor = colorObject;
+    // var colorObject = new paper.Color("#ffff00");
+    unionItem.strokeColor = ambientEdgeColor;
     let clumpGroup = new paper.Group(savedForUnion);
     unionItem.insertBelow(savedForUnion[ 0 ]);
     let partialUnionItem = unionItem.clone({ insert: true, deep: true })
 
-    var colorObject = new paper.Color("orange");
-    partialUnionItem.strokeColor = colorObject;
+    // var colorObject = new paper.Color("purple");
+    partialUnionItem.strokeColor = ambientFillColor;
+    // @ts-ignore
+    partialUnionItem.alpha = ambientAlpha
     // partialUnionItem.fillColor = "#f00"
     // hoverJitter(partialUnionItem, 2, -2)
     // hoverJitter(unionItem, -5, 2)
@@ -105,6 +112,17 @@ function renderClump(clump) {
  * @returns nodeGroup
  */
 function renderNode(node) {
+    let noclumps = node.clumps.length == 0
+    let nochildren = node.children.length == 0
+    if (noclumps && nochildren) {
+        console.log('empty model')
+        return
+    } else {
+        console.log(`clumps: ${node.clumps.length}, children: ${node.children.length}`)
+    }
+
+    let nodeWideStrokeColor = node.nodeEdgeColor;
+    let nodeWideFillColor = node.nodeFillColor;
     let children = node[ "children" ];
     let savedForNodeGroup = [];
     let savedForNodeUnion = [];
@@ -114,8 +132,11 @@ function renderNode(node) {
         savedForNodeUnion.push(nodeResults[ "nodeWidePartialUnionItem" ]);
     })
     var clumps = node[ 'clumps' ];
+    let ambientFillColor = new paper.Color(node[ "nodeFillColor" ]);
+    let ambientEdgeColor = new paper.Color(node[ "nodeEdgeColor" ]);
+    let ambientAlpha = node[ "nodeAlpha" ];
     clumps.forEach(function (clump) {
-        let clumpResults = renderClump(clump);
+        let clumpResults = renderClump(clump, ambientEdgeColor, ambientFillColor, ambientAlpha);
         // savedForUnion is just getting the outlines of clumps
         savedForNodeGroup.push(clumpResults[ "clumpGroup" ]);
         savedForNodeUnion.push(clumpResults[ "partialUnionItem" ]);
@@ -124,8 +145,8 @@ function renderNode(node) {
 
     if (savedForNodeUnion.length == 0) {
         console.log('zero')
-        console.log(savedForNodeUnion[ 0 ])
-        var nodeWideUnionItem = savedForNodeUnion[ 0 ].clone({ insert: true, deep: true })
+        // console.log(savedForNodeUnion[ 0 ])
+        // var nodeWideUnionItem = savedForNodeUnion[ 0 ].clone({ insert: true, deep: true })
     } else if (savedForNodeUnion.length == 1) {
         // console.log('one')
         // console.log(savedForNodeUnion[ 0 ])
@@ -145,7 +166,10 @@ function renderNode(node) {
 
 
     nodeWideUnionItem.strokeWidth = 21;
-    nodeWideUnionItem.strokeColor = "#cf3300";
+    nodeWideUnionItem.strokeColor = node.nodeEdgeColor;
+    nodeWideUnionItem.fillColor = node.nodeFillColor;
+    nodeWideUnionItem.translate(new paper.Point(22, 22))
+
     // hoverJitter(nodeWideUnionItem, 3,3);
     // console.log("");
     // console.log("nodeWideUnionItem:");
@@ -221,8 +245,8 @@ export function setCanvasBackgroundColor() {
 export function logRenderData() {
     Bridge.get('getRenderData')
         .then(function (result) {
-            // console.log("\n");
-            // console.log(result);
+            console.log("\n");
+            console.log(result);
         });
 }
 

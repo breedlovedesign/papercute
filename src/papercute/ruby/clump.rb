@@ -18,6 +18,7 @@ module BreedloveDesign
         @faces = faces
         @inherited_traits = inherited_traits
         @tr = @inherited_traits.tr
+        # @tr = @inherited_traits.inhreted_tr
         bounds = Geom::BoundingBox.new
         @faces.each { |f| bounds.add f.bounds }
         @center = bounds.center.transform(@tr)

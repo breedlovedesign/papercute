@@ -34,8 +34,8 @@ module BreedloveDesign
           # otherwise, inherit visiblity from parent
           @visible = inherited_traits.visible
         end
-        # @tr = inherited_traits.tr * item.transformation
-        @tr = item.transformation * inherited_traits.tr
+        @tr = inherited_traits.tr * item.transformation
+        # @tr = item.transformation * inherited_traits.tr
         @inhreted_tr = inherited_traits.tr
       end
 

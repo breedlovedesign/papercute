@@ -128,8 +128,10 @@ function renderNode(node) {
     let savedForNodeUnion = [];
     children.forEach(function (child) {
         let nodeResults = renderNode(child);
-        savedForNodeGroup.push(nodeResults[ "nodeWideGroup" ]);
-        savedForNodeUnion.push(nodeResults[ "nodeWidePartialUnionItem" ]);
+        if (nodeResults != undefined) {
+            savedForNodeGroup.push(nodeResults[ "nodeWideGroup" ]);
+            savedForNodeUnion.push(nodeResults[ "nodeWidePartialUnionItem" ]);
+        }
     })
     var clumps = node[ 'clumps' ];
     let ambientFillColor = new paper.Color(node[ "nodeFillColor" ]);

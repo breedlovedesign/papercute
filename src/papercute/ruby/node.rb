@@ -58,8 +58,6 @@ module BreedloveDesign
         else
           get_clumps(
             faces: @faces,
-            enclosing_tr: inheritable_traits.tr,
-            # enclosing_tr: inheritable_traits.tr,
             ent_id: @name,
             inherited_color: @inheritable_traits.fill_color,
             # inherited_color: @inheritable_traits.fill_color,
@@ -77,7 +75,8 @@ module BreedloveDesign
         @clumps
       end
 
-      attr_reader :children, :inheritable_traits, :tr, :total_tr, :name
+      # attr_reader :children, :inheritable_traits, :tr, :total_tr, :name
+      attr_reader :children, :inheritable_traits, :name
       sig { returns(T::Boolean) }
 
       def is_leaf?()
@@ -113,7 +112,6 @@ module BreedloveDesign
       sig do
         params(
           faces: T::Array[Sketchup::Face],
-          enclosing_tr: Geom::Transformation,
           ent_id: String,
           inherited_color: String,
           groups_of_connected_front_facing_faces: T::Array[T::Array[Sketchup::Face]],
@@ -122,20 +120,19 @@ module BreedloveDesign
 
       def get_clumps(
         faces:,
-        enclosing_tr:,
         ent_id:,
         inherited_color:,
         groups_of_connected_front_facing_faces: []
       )
         unprocessed_faces =
-          faces.reject { |f| Sorter.rear_facing?(f, enclosing_tr) }
+          faces.reject { |f| Sorter.rear_facing?(f, @inheritable_traits.tr) }
         clump_seed = unprocessed_faces.shift
         if clump_seed
           clump_of_faces =
             clump_seed.all_connected.select { |ent| ent.is_a?(Sketchup::Face) }
           clump_of_front_faces =
             clump_of_faces.reject do |face|
-              Sorter.rear_facing?(face, enclosing_tr)
+              Sorter.rear_facing?(face, @inheritable_traits.tr)
             end
           unless groups_of_connected_front_facing_faces.include?(
             clump_of_front_faces
@@ -145,7 +142,6 @@ module BreedloveDesign
           unprocessed_faces -= clump_of_front_faces
 
           get_clumps faces: unprocessed_faces,
-                     enclosing_tr: enclosing_tr,
                      ent_id: ent_id,
                      inherited_color: inherited_color,
                      groups_of_connected_front_facing_faces: groups_of_connected_front_facing_faces
@@ -169,7 +165,7 @@ module BreedloveDesign
             groups_of_connected_front_facing_faces.collect do |group_of_faces|
               Clump.new(
                 faces: group_of_faces,
-                inherited_traits: @inherited_traits,
+                inherited_traits: @inheritable_traits,
                 ent_id: ent_id,
               )
             end

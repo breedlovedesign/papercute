@@ -19,59 +19,6 @@ module BreedloveDesign
         @faces2d = sets_of_pts_2d.collect(&:to_h)
       end
 
-
-
-      def get_clumps(
-        faces:,
-        depth:,
-        ent_id:,
-        groups_of_connected_front_facing_faces: []
-      )
-        unprocessed_faces = faces.reject { |f| Sorter.rear_facing?(f, @tr) }
-        clump_seed = unprocessed_faces.shift
-        if clump_seed
-          clump_of_faces =
-            clump_seed.all_connected.select { |ent| ent.is_a?(Sketchup::Face) }
-          clump_of_front_faces =
-            clump_of_faces.reject { |face| Sorter.rear_facing?(face, @tr) }
-          unless groups_of_connected_front_facing_faces.include?(
-            clump_of_front_faces
-          )
-            groups_of_connected_front_facing_faces << clump_of_front_faces
-          end
-          unprocessed_faces -= clump_of_front_faces
-          depth += 1
-
-          get_clumps faces: unprocessed_faces,
-                     depth: depth,
-                     ent_id: ent_id,
-                     groups_of_connected_front_facing_faces: groups_of_connected_front_facing_faces
-        else
-          thing = groups_of_connected_front_facing_faces[0]
-          if thing
-            thing.sort_by! do |face|
-              [
-                Sorter.largest_z(face),
-                Sorter.largest_x(face),
-                Sorter.largest_y(face),
-              ]
-            end
-          else
-          end
-          clump_objects =
-            groups_of_connected_front_facing_faces.collect do |group_of_faces|
-              Clump.new(
-                faces: group_of_faces,
-                inherited_traits: @inherited_traits,
-                ent_id: ent_id,
-              )
-            end
-          depth -= 1
-
-          return clump_objects
-        end
-      end
-
       def dist
         @center.transform(@tr).distance(
           Sketchup.active_model.active_view.camera.eye

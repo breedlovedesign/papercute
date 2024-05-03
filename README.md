@@ -37,8 +37,8 @@ I've broken them down by language and tried to provide some rationale.
 ### Ruby
 
 If you look at the `Rakefile` you will see some build steps that 'unsorbet' the ruby output.
-These are removing the [sigils](https://sorbet.org/docs/static#fnref1), and removing the [type signatures](https://sorbet.org/docs/sigs)
+These are removing the [sigils](https://sorbet.org/docs/static#fnref1), and removing the [type signatures](https://sorbet.org/docs/sigs).
 
 ### JavaScript
 
-I'm new to javascript and desparately wanted code completion that would draw from the two libraries I am using. I achieved this for the most part but it came at a price. The js part of the build is a bit of a farce. The bundle created by webpack doesn't contain anything from ['sketchup-bridge'](https://github.com/Aerilius/sketchup-bridge), I manually comment out the import statement before bundling, and the actuall `bridge.js` file linked in the `index.html` for the main dialog is the one distributed by Aerilius. Again, I am only going through this rigamarole to get code completion, which is not readily available if all one's editor can see is an optimised minified js file.
+I'm new to javascript and desparately wanted code completion that would draw from the two libraries I am using. I achieved this for the most part but it came at a price. The js part of the build is a bit of a farce. The bundle created by webpack doesn't contain anything from ['sketchup-bridge'](https://github.com/Aerilius/sketchup-bridge), I manually comment out the import statement before bundling, and the actuall `bridge.js` file linked in the `index.html` for the main dialog is the one distributed by [Aerilius](https://github.com/Aerilius). Again, I am only going through this rigamarole to get code completion, which is not readily available if all one's editor can see is an optimised minified js file.
